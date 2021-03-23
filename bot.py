@@ -1,6 +1,5 @@
 import telebot
-
-from bot_utils import read_token, get_coin, get_cube, get_synonym, get_antonym
+from bot_utils import read_token, get_coin, get_cube, get_synonym, get_antonym, days_lived, get_horoscope
 
 # Инициализация бота
 bot_token = read_token('token.txt')
@@ -11,11 +10,13 @@ print('[i] Starting bot')
 # Стартовая команда
 @bot.message_handler(commands=['start', 'help'])
 def command_start(message):
-    bot.send_message(message.chat.id, '*Список доступных команд:*\n'
+    bot.send_message(message.chat.id, 'Список доступных команд:\n'
                                       '/coin - Подбросить монетку\n'
                                       '/cube - Подбросить кубик\n'
                                       '/synonym - Поиск синонимов\n'
-                                      '/antonym - Поиск антонимов', parse_mode= 'Markdown')
+                                      '/antonym - Поиск антонимов\n'
+                                      '/days_lived - Вычислений дней прожитых вами\n'
+                                      '/horoscope - Гороскоп по дате рождения')
 
 
 # Бросить монетку
@@ -63,13 +64,45 @@ def command_input_antonym(message):
     bot.register_next_step_handler(sent, command_antonym)
 
 
-# Поиск антонимов (возвращение синонима)
+# Поиск антонимов (возвращение антонима)
 def command_antonym(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.row(telebot.types.InlineKeyboardButton(text='Начать поиск нового антонима', callback_data='antonym'),
                  telebot.types.InlineKeyboardButton(text='К списку команд', callback_data='back'))
 
     bot.send_message(message.chat.id, get_antonym(message.text), reply_markup=keyboard)
+
+
+# Расчет прожитых дней (ввод даты)
+@bot.message_handler(commands=['days_lived'])
+def command_input_days_lived(message):
+    sent = bot.send_message(message.chat.id, 'Введите дату рождения в формате дд.мм.гггг:')
+    bot.register_next_step_handler(sent, command_days_lived)
+
+
+# Расчет прожитых дней (возвращение количества дней)
+def command_days_lived(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.row(telebot.types.InlineKeyboardButton(text='Расчитать заново', callback_data='days_lived'),
+                 telebot.types.InlineKeyboardButton(text='К списку команд', callback_data='back'))
+
+    bot.send_message(message.chat.id, days_lived(message.text), reply_markup=keyboard)
+
+
+# Гороскоп (ввод даты)
+@bot.message_handler(commands=['horoscope'])
+def command_input_horoscope(message):
+    sent = bot.send_message(message.chat.id, 'Введите дату рождения в формате дд.мм.гггг:')
+    bot.register_next_step_handler(sent, command_horoscope)
+
+
+# Вывод гороскопа (возвращение количества дней)
+def command_horoscope(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.row(telebot.types.InlineKeyboardButton(text='Другой гороскоп', callback_data='horoscope'),
+                 telebot.types.InlineKeyboardButton(text='К списку команд', callback_data='back'))
+
+    bot.send_message(message.chat.id, get_horoscope(message.text), reply_markup=keyboard)
 
 
 # Обработка результатов
@@ -85,9 +118,12 @@ def query_handler(call):
         command_input_synonym(call.message)
     elif call.data == 'antonym':
         command_input_antonym(call.message)
+    elif call.data == 'days_lived':
+        command_input_days_lived(call.message)
+    elif call.data == 'horoscope':
+        command_input_horoscope(call.message)
     # Скрыть клавиатуру
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
 
 
 bot.polling()
-
