@@ -1,9 +1,15 @@
+import os
+
 import telebot
-from bot_utils import read_token, get_coin, get_cube, get_synonym, get_antonym, days_lived, get_horoscope
+from dotenv import load_dotenv
+
+from bot_utils import get_coin, get_cube, get_synonym, get_antonym, days_lived, get_horoscope
+
 
 # Инициализация бота
-bot_token = read_token('token.txt')
-bot = telebot.TeleBot(bot_token)
+load_dotenv()
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 print('[i] Starting bot')
 
 
@@ -83,7 +89,7 @@ def command_input_days_lived(message):
 # Расчет прожитых дней (возвращение количества дней)
 def command_days_lived(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
-    keyboard.row(telebot.types.InlineKeyboardButton(text='Расчитать заново', callback_data='days_lived'),
+    keyboard.row(telebot.types.InlineKeyboardButton(text='Рассчитать заново', callback_data='days_lived'),
                  telebot.types.InlineKeyboardButton(text='К списку команд', callback_data='back'))
 
     bot.send_message(message.chat.id, days_lived(message.text), reply_markup=keyboard)

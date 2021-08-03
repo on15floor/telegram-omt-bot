@@ -1,13 +1,8 @@
-from random import randint
-from bs4 import *
-import requests
 import datetime
+from random import randint
 
-
-# Считывание токена из файла
-def read_token(filename: str):
-    with open(filename) as f:
-        return f.read().strip()
+import requests
+from bs4 import *
 
 
 # Возвращает ссылку на случайную монету
@@ -83,13 +78,13 @@ def get_horoscope(birthday: str):
         class_astro = html.findAll("ul", {'class': 'astroprtret'})
         zodiac = class_astro[0].contents[0]
         zodiac_result = f'Знак зодиака: ' \
-                        f'{zodiac.contents[1].text.strip()}\n{zodiac.contents[2].text.replace(">>>","").strip()}\n\n'
+                        f'{zodiac.contents[1].text.strip()}\n{zodiac.contents[2].text.replace(">>>", "").strip()}\n\n'
         maya = class_astro[0].contents[1]
         maya_result = f'Майянский знак рождения: ' \
-                      f'{maya.contents[1].text.strip()}\n{maya.contents[2].text.replace(">>>","").strip()}\n\n'
+                      f'{maya.contents[1].text.strip()}\n{maya.contents[2].text.replace(">>>", "").strip()}\n\n'
         china = class_astro[0].contents[2]
         china_result = f'Китайский знак рождения: ' \
-                       f'{china.contents[1].text.strip()}\n{china.contents[2].text.replace(">>>","").strip()}\n\n'
+                       f'{china.contents[1].text.strip()}\n{china.contents[2].text.replace(">>>", "").strip()}\n\n'
 
         # Получаем гороскоп
         key = zodiac.contents[1].contents[1].attrs['href'].split('/')[4].split('?')[1]
